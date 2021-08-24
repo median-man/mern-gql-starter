@@ -7,20 +7,13 @@ const typeDefs = gql`
 
   type Mutation {
     createUser(email: String!, password: String!, username: String!): User
+    login(email: String!, password: String!): User
   }
 
   type User {
     _id: ID!
     username: String!
     email: String!
-  }
-
-  """
-  Describes data required for authenticating a user.
-  """
-  type AuthData {
-    email: String!
-    password: String!
   }
 `;
 
