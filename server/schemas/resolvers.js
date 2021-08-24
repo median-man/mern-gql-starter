@@ -1,8 +1,10 @@
+const { User } = require("../models");
+
 const resolvers = {
-  Query: {
-    temp: () => "Hello, MERN!",
+  Query: {},
+  Mutation: {
+    createUser: (parent, args) => User.create({ ...args }),
   },
-  Mutation: {},
 };
 
 module.exports = resolvers;
