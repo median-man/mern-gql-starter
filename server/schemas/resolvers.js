@@ -1,5 +1,8 @@
+const jwt = require("jsonwebtoken");
+const util = require("util");
 const { AuthenticationError } = require("apollo-server-express");
 const { User } = require("../models");
+const { signToken } = require("../util/auth");
 
 const resolvers = {
   Query: {},
@@ -15,7 +18,8 @@ const resolvers = {
       if (!authentic) {
         throw new AuthenticationError("Invalid username or password");
       }
-      return user;
+      const token = await signToken(user);
+      return { token, user };
     },
   },
 };
