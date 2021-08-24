@@ -1,12 +1,20 @@
 const {
   AuthenticationError,
   UserInputError,
+  ForbiddenError,
 } = require("apollo-server-express");
 const { User } = require("../models");
 const { signToken } = require("../util/auth");
 
 const resolvers = {
-  Query: {},
+  Query: {
+    me: async (parent, args, ctx) => {
+      if (!ctx.user) {
+        throw new ForbiddenError("Must be logged in.");
+      }
+      return User.findOne({ email: ctx.user.email });
+    },
+  },
   Mutation: {
     createUser: async (parent, args) => {
       try {
