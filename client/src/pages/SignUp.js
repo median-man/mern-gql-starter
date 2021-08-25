@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useMutation } from "@apollo/client";
+import { useEffect, useState } from "react";
 import { Redirect } from "react-router-dom";
+import { CREATE_USER } from "../util/mutations";
 
 // This signup form is intentionally minimalist to reduce effort required to
 // customize it to your app's needs. See the excellent best practices guide for
@@ -25,29 +27,44 @@ const initialFormState = {
 
 export default function SignUp({ auth }) {
   const { isLoggedIn, setToken } = auth;
+  const [createUser, { data, loading }] = useMutation(CREATE_USER);
   const [formState, setFormState] = useState(initialFormState);
-  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (error) {
+      // TODO: add error handling
+      alert(error.message);
+      console.log(error);
+    }
+  }, [error]);
+
+  useEffect(() => {
+    const token = data?.createUser.token;
+    if (token) {
+      setToken(token);
+    }
+  }, [data, setToken]);
+
   const handleInputChange = (evt) => {
     const { name, value } = evt.target;
     setFormState((prevState) => ({ ...prevState, [name]: value }));
   };
+
   const handleSubmit = async (evt) => {
     evt.preventDefault();
-    // TODO: implement improved validation.
-    if (!formState.email || !formState.password || !formState.username) {
-      // TODO: implement improved error message and replace alert
-      alert("Provide a valid email, username, and password.");
-      return;
+    try {
+      // TODO: implement improved validation.
+      if (!formState.email || !formState.password || !formState.username) {
+        // TODO: implement improved error message and replace alert
+        alert("Provide a valid email, username, and password.");
+        return;
+      }
+
+      await createUser({ variables: formState });
+    } catch (error) {
+      setError(error);
     }
-    setLoading(true);
-
-    // TODO: replace pause with get token from backend
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // TODO: pass token to setToken
-    setToken("token");
-
-    // TODO: add error handling
   };
   if (isLoggedIn) {
     // redirect to home if user is logged in
