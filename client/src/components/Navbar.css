@@ -1,0 +1,21 @@
+.navbar {
+  display: flex;
+}
+
+.navbar-link {
+  width: 4em;
+
+  /* style button as link */
+  background: none;
+  border: none;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: inherit;
+  color: inherit;
+}
+
+.active {
+  color: gray;
+  text-decoration: none;
+  font-weight: bold;
+}

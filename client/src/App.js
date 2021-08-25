@@ -1,24 +1,34 @@
-import logo from "./logo.svg";
-import "./App.css";
+import { useState } from "react";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import SignUp from "./pages/SignUp";
 
 function App() {
+  // TODO: initialize login state from auth token
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const logout = () => setIsLoggedIn(false);
+  const setToken = async (token) => {
+    // TODO: save auth token in local storage
+    setIsLoggedIn(Boolean(token));
+  };
+  const auth = { isLoggedIn, logout, setToken };
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Navbar isLoggedIn={isLoggedIn} onLogout={logout} />
+      <Switch>
+        <Route exact path="/">
+          <Home auth={auth} />
+        </Route>
+        <Route path="/login">
+          <Login auth={auth} />
+        </Route>
+        <Route path="/signup">
+          <SignUp auth={auth} />
+        </Route>
+      </Switch>
+    </Router>
   );
 }
 
