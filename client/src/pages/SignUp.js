@@ -1,6 +1,7 @@
 import { useMutation } from "@apollo/client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Redirect } from "react-router-dom";
+import { useAuth } from "../util/auth";
 import { CREATE_USER } from "../util/mutations";
 
 // This signup form is intentionally minimalist to reduce effort required to
@@ -25,26 +26,10 @@ const initialFormState = {
   password: "",
 };
 
-export default function SignUp({ auth }) {
-  const { isLoggedIn, setToken } = auth;
-  const [createUser, { data, loading }] = useMutation(CREATE_USER);
+export default function SignUp() {
+  const { isLoggedIn, login } = useAuth();
+  const [createUser, { loading }] = useMutation(CREATE_USER);
   const [formState, setFormState] = useState(initialFormState);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    if (error) {
-      // TODO: add error handling
-      alert(error.message);
-      console.log(error);
-    }
-  }, [error]);
-
-  useEffect(() => {
-    const token = data?.createUser.token;
-    if (token) {
-      setToken(token);
-    }
-  }, [data, setToken]);
 
   const handleInputChange = (evt) => {
     const { name, value } = evt.target;
@@ -61,11 +46,14 @@ export default function SignUp({ auth }) {
         return;
       }
 
-      await createUser({ variables: formState });
+      const { data } = await createUser({ variables: formState });
+      login(data.createUser.token);
     } catch (error) {
-      setError(error);
+      alert(error.message);
+      console.log(error);
     }
   };
+
   if (isLoggedIn) {
     // redirect to home if user is logged in
     return <Redirect to="/" />;
