@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client";
-import { LOGIN } from "../util/mutations";
+import { CREATE_USER, LOGIN } from "../util/mutations";
 import { createContext, useContext, useEffect, useState } from "react";
 import decode from "jwt-decode";
 
@@ -53,8 +53,10 @@ export const AuthProvider = ({ children }) => {
   const [authToken, setAuthToken] = useState(() => token.get());
   const [isLoggedIn, setIsLoggedIn] = useState(!token.expired());
   const [error, setError] = useState(null);
-  const [loginUser, { loading }] = useMutation(LOGIN);
+  const [loginUser, { loading: loginLoading }] = useMutation(LOGIN);
+  const [createUser, { loading: signupLoading }] = useMutation(CREATE_USER);
 
+  const loading = loginLoading || signupLoading;
   const user = token.data();
 
   useEffect(() => {
@@ -67,7 +69,7 @@ export const AuthProvider = ({ children }) => {
       // TODO: implement improved validation.
       if (!email || !password) {
         // TODO: implement improved error message.
-        throw new Error("Provide a valid email and password.");
+        throw new Error("Auth error. Invalid parameter received.");
       }
       const { data } = await loginUser({ variables: { email, password } });
       setAuthToken(data.login.token);
@@ -78,15 +80,34 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const signup = async () => {};
+  const signup = async ({ email, password, username }) => {
+    try {
+      // TODO: implement improved validation.
+      if (!email || !password || !username) {
+        // TODO: implement improved error message
+        throw new Error("Auth error. Invalid parameter received.");
+      }
+
+      const { data } = await createUser({
+        variables: { email, password, username },
+      });
+      setAuthToken(data.createUser.token);
+    } catch (error) {
+      console.log(error);
+      setError(error.message);
+    }
+  };
 
   const logout = () => setAuthToken("");
+
   const auth = {
     isLoggedIn,
-    login,
-    logout,
     user,
     loading,
+    error,
+    login,
+    logout,
+    signup,
   };
   return <authCtx.Provider value={auth}>{children}</authCtx.Provider>;
 };
