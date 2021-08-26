@@ -3,19 +3,40 @@
 }
 
 .navbar-link {
+  --border: 1px solid #444;
+
+  display: block;
   width: 4em;
+  padding: 0.25em;
+  text-align: center;
+  text-decoration: none;
+  border: var(--border);
+  border-left: none;
 
   /* style button as link */
   background: none;
-  border: none;
-  text-decoration: underline;
   cursor: pointer;
   font-size: inherit;
   color: inherit;
 }
 
-.active {
-  color: gray;
-  text-decoration: none;
-  font-weight: bold;
+.navbar-link:first-child {
+  border-left: var(--border);
+}
+
+.navbar-link:hover {
+  background-color: #ddd;
+}
+
+.navbar-link:active {
+  background-color: #666;
+  color: white;
+}
+
+.active,
+.active:hover,
+.active:active {
+  color: white;
+  background-color: #444;
+  cursor: default;
 }

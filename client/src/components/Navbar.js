@@ -10,9 +10,14 @@ export default function Navbar() {
         Home
       </NavLink>
       {isLoggedIn ? (
-        <button className="navbar-link" onClick={logout}>
-          Logout
-        </button>
+        <>
+          <NavLink to="/protected" className="navbar-link">
+            User
+          </NavLink>
+          <button className="navbar-link" onClick={logout}>
+            Logout
+          </button>
+        </>
       ) : (
         <>
           <NavLink to="/login" className="navbar-link">
