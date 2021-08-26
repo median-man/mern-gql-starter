@@ -2,47 +2,29 @@
 
 ## Root-level Functionality
 
-- The `npm start` script: In production, we only run the back-end server, which will serve the built React application code as its front end.
-- The `npm run develop` script: In development, we need to run both a back-end server and the React development server, so we use the `concurrently` library to execute two separate promises at the same time.
+- Add a `.env` file to `server` directory to run locally. Use `server/.env.example` as a template.
 
-- The `npm install` script: Since our dependencies for the entire application exist in two smaller applications, we use this script to automatically install all of them at once.
+- `npm start` script: Production startup. Only runs backend server.
 
-- The `npm run seed` script: We can seed our database with data when we run this command.
+- `npm run develop` script: Uses `concurrently` to run the back-end with `nodemon` and launches the `create-react-app` development server for front-end development. `concurrently` runs these within the same terminal. Logging is tagged with `[server]` or `[client]`.
 
-- The `npm run build` script: When we deploy our application, we instruct the hosting service to execute the `build` command and build our production-ready React application."
+- `npm run client` script: Launches the `create-react-app` development server for the client only. Will not start back-end.
 
-```json
-"scripts": {
-  "start": "node server/server.js",
-  "develop": "concurrently \"cd server && npm run watch\" \"cd client && npm start\"",
-  "install": "cd server && npm i && cd ../client && npm i",
-  "seed": "cd server && npm run seed",
-  "build": "cd client && npm run build"
-},
-```
+- `npm run server` script: Starts the back-end server with `nodemon` for easy development without launching the client.
 
-## Client-side Functionality
+- The `npm install` script: Installs all dependencies for root as wells as `client` and `server`.
 
-- Since we run a front-end and back-end server for our full-stack application in development, we set it up so all client-side requests to our API server are prefixed with the API server's URL.
+- The `npm run build` script: Runs `create-react-app` build script to create client bundles and assets.
 
-```json
-"proxy": "http://localhost:3001",
-```
+## Deploying to Heroku
 
-## Server-side Functionality
+- Requires a MongoDB server. MongoDB Atlas is a fairly easy choice for this requirement. Create an Atlas account and setup a database.
 
-- In production, when we no longer need to use the Create React App development server, we set up our server to serve the built React front-end application that is in the `../client/build` directory.
+- Add the following values to the Heroku config for the app:
 
-```js
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../client/build")));
-}
-```
+  - `SECRET` - used for signing and verifying tokens
+  - `MONGODB_URI` - used for connecting to MongoDB service
 
-- Since the React front-end application will handle its own routing, we set up a wildcard route on our server that will serve the front end whenever a request for a non-API route is received.
+- Push your code to GitHub
 
-```js
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../client/build/index.html"));
-});
-```
+- Connect your Heroku app with GitHub or push code directly to Heroku. (See [Deploying Node.js Apps on Heroku](https://devcenter.heroku.com/articles/deploying-nodejs))
