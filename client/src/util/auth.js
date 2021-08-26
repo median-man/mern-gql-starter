@@ -1,3 +1,5 @@
+import { useMutation } from "@apollo/client";
+import { LOGIN } from "../util/mutations";
 import { createContext, useContext, useEffect, useState } from "react";
 import decode from "jwt-decode";
 
@@ -40,13 +42,19 @@ token.init();
 const authCtx = createContext({
   user: null,
   isLoggedIn: false,
+  loading: false,
+  error: null,
   login: () => {},
   logout: () => {},
+  signup: () => {},
 });
 
 export const AuthProvider = ({ children }) => {
   const [authToken, setAuthToken] = useState(() => token.get());
   const [isLoggedIn, setIsLoggedIn] = useState(!token.expired());
+  const [error, setError] = useState(null);
+  const [loginUser, { loading }] = useMutation(LOGIN);
+
   const user = token.data();
 
   useEffect(() => {
@@ -54,13 +62,31 @@ export const AuthProvider = ({ children }) => {
     setIsLoggedIn(!token.expired());
   }, [authToken]);
 
-  const login = (token) => setAuthToken(token);
+  const login = async ({ email, password }) => {
+    try {
+      // TODO: implement improved validation.
+      if (!email || !password) {
+        // TODO: implement improved error message.
+        throw new Error("Provide a valid email and password.");
+      }
+      const { data } = await loginUser({ variables: { email, password } });
+      setAuthToken(data.login.token);
+    } catch (error) {
+      console.log(error);
+      setError(error.message);
+      setAuthToken("");
+    }
+  };
+
+  const signup = async () => {};
+
   const logout = () => setAuthToken("");
   const auth = {
     isLoggedIn,
     login,
     logout,
     user,
+    loading,
   };
   return <authCtx.Provider value={auth}>{children}</authCtx.Provider>;
 };
