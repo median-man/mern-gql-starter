@@ -7,8 +7,6 @@ const httpLink = createHttpLink({
 });
 
 const authLink = setContext((_, { headers }) => {
-  // TODO: refactor to get token from AuthService util
-  // get the authentication token from local storage if it exists
   const authToken = token.get();
   // return the headers to the context so httpLink can read them
   return {

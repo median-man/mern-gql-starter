@@ -1,21 +1,10 @@
 import { useMutation } from "@apollo/client";
 import { CREATE_USER, LOGIN } from "../util/mutations";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useReducer } from "react";
 import decode from "jwt-decode";
 
 export const token = {
-  _token: "",
-  _payload: null,
-  init() {
-    token._token = token.get();
-    token.decode();
-  },
-  decode() {
-    token._payload = token._token ? decode(token._token) : null;
-  },
   set(value) {
-    token._token = value;
-    token.decode();
     if (value) {
       localStorage.setItem("token", value);
       return;
@@ -25,46 +14,86 @@ export const token = {
   get() {
     return localStorage.getItem("token") || "";
   },
-  expired() {
-    const exp = token._payload?.exp;
-    if (!exp) {
-      return true;
-    }
-    return exp < Date.now() / 1000;
-  },
-  data() {
-    return token._payload?.data;
-  },
 };
 
-token.init();
+const parseToken = (token) => {
+  const { exp, data } = decode(token);
 
-const authCtx = createContext({
-  user: null,
-  isLoggedIn: false,
+  if (!exp || exp < Date.now() / 1000) {
+    return { isLoggedIn: false, user: null };
+  }
+
+  return { isLoggedIn: true, user: data };
+};
+
+// actions
+const LOADING = "LOADING";
+const LOGOUT = "LOGOUT";
+const LOGIN_SUCCESS = "LOGIN_SUCCESS";
+const ERROR = "ERROR";
+
+const defaultState = {
+  authToken: "",
   loading: false,
   error: null,
-  login: () => {},
-  logout: () => {},
-  signup: () => {},
+  isLoggedIn: false,
+  user: null,
+};
+
+const initState = () => {
+  const authToken = token.get();
+  if (!authToken) {
+    return defaultState;
+  }
+  return {
+    ...defaultState,
+    authToken,
+    ...parseToken(authToken),
+  };
+};
+
+const authReducer = (state, action) => {
+  switch (action.type) {
+    case LOGOUT:
+      return { ...defaultState, authToken: "" };
+
+    case LOADING:
+      return { ...state, loading: true, error: null };
+
+    case LOGIN_SUCCESS:
+      const authToken = action.payload;
+      const { user, isLoggedIn } = parseToken(authToken);
+      return { ...state, loading: false, authToken, user, isLoggedIn };
+
+    case ERROR:
+      return {
+        ...defaultState,
+        error: action.payload,
+      };
+
+    default:
+      throw new Error(`Invalid action '${action.type}'`);
+  }
+};
+
+const authCtx = createContext({
+  ...defaultState,
+  login: async () => {},
+  logout: async () => {},
+  signup: async () => {},
 });
 
 export const AuthProvider = ({ children }) => {
-  const [authToken, setAuthToken] = useState(() => token.get());
-  const [isLoggedIn, setIsLoggedIn] = useState(!token.expired());
-  const [error, setError] = useState(null);
-  const [loginUser, { loading: loginLoading }] = useMutation(LOGIN);
-  const [createUser, { loading: signupLoading }] = useMutation(CREATE_USER);
-
-  const loading = loginLoading || signupLoading;
-  const user = token.data();
+  const [state, dispatch] = useReducer(authReducer, initState);
+  const [loginUser] = useMutation(LOGIN);
+  const [createUser] = useMutation(CREATE_USER);
 
   useEffect(() => {
-    token.set(authToken);
-    setIsLoggedIn(!token.expired());
-  }, [authToken]);
+    token.set(state.authToken);
+  }, [state.authToken]);
 
   const login = async ({ email, password }) => {
+    dispatch({ type: LOADING });
     try {
       // TODO: implement improved validation.
       if (!email || !password) {
@@ -72,15 +101,15 @@ export const AuthProvider = ({ children }) => {
         throw new Error("Auth error. Invalid parameter received.");
       }
       const { data } = await loginUser({ variables: { email, password } });
-      setAuthToken(data.login.token);
+      dispatch({ type: LOGIN_SUCCESS, payload: data.login.token });
     } catch (error) {
       console.log(error);
-      setError(error.message);
-      setAuthToken("");
+      dispatch({ type: ERROR, payload: error.message });
     }
   };
 
   const signup = async ({ email, password, username }) => {
+    dispatch({ type: LOADING });
     try {
       // TODO: implement improved validation.
       if (!email || !password || !username) {
@@ -91,20 +120,17 @@ export const AuthProvider = ({ children }) => {
       const { data } = await createUser({
         variables: { email, password, username },
       });
-      setAuthToken(data.createUser.token);
+      dispatch({ type: LOGIN_SUCCESS, payload: data.createUser.token });
     } catch (error) {
       console.log(error);
-      setError(error.message);
+      dispatch({ type: ERROR, payload: error.message });
     }
   };
 
-  const logout = () => setAuthToken("");
+  const logout = () => dispatch({ type: LOGOUT });
 
   const auth = {
-    isLoggedIn,
-    user,
-    loading,
-    error,
+    ...state,
     login,
     logout,
     signup,
