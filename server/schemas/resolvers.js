@@ -9,6 +9,8 @@ const { signToken } = require("../util/auth");
 const resolvers = {
   Query: {
     me: async (parent, args, ctx) => {
+      // if ctx.user is undefined, then no token or an invalid token was
+      // provided by the client.
       if (!ctx.user) {
         throw new ForbiddenError("Must be logged in.");
       }

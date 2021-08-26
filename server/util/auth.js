@@ -8,6 +8,7 @@ jwt.sign = util.promisify(jwt.sign);
 jwt.verify = util.promisify(jwt.verify);
 
 const signToken = (user) => {
+  // TODO: customize the data encoded within the token
   const data = {
     _id: user._id,
     email: user.email,
