@@ -1,4 +1,6 @@
-# Add Comments to Implementation of the MERN-stack Architecture
+# MERN-GQL-START
+
+Boilerplate app for full-stack MERN app with Create React App client tool chain. Includes React, JWT authentication, Mongoose/MongoDB, Apollo Server/Client, and ExpressJS.
 
 ## Getting Started
 
