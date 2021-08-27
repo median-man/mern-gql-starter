@@ -4,8 +4,10 @@ const {
 } = require("apollo-server-express");
 const { User } = require("../models");
 const { signToken } = require("../util/auth");
+const { dateScalar } = require("./customScalars");
 
 const resolvers = {
+  Date: dateScalar,
   Query: {
     me: async (parent, args, ctx) => {
       // if ctx.user is undefined, then no token or an invalid token was
@@ -41,6 +43,8 @@ const resolvers = {
         throw new AuthenticationError("Invalid username or password");
       }
       const token = await signToken(user);
+      user.lastLogin = Date.now();
+      await user.save();
       return { token, user };
     },
   },

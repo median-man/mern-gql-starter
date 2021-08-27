@@ -1,6 +1,9 @@
 const { gql } = require("apollo-server-express");
 
 const typeDefs = gql`
+  "Unix time stamp in milliseconds."
+  scalar Date
+
   type Query {
     "Find the logged in user."
     me: User
@@ -20,6 +23,7 @@ const typeDefs = gql`
     _id: ID!
     username: String!
     email: String!
+    lastLogin: Date!
   }
 `;
 

@@ -37,7 +37,7 @@ const authMiddleware = async ({ req }) => {
     const { data } = await jwt.verify(token, SECRET, { maxAge: TOKEN_EXP });
     req.user = data;
   } catch (err) {
-    console.log("Invalid token");
+    console.log(`Invalid token received. Token: "${token}"`);
   }
 
   // return the request object so it can be passed to the resolver as `context`
