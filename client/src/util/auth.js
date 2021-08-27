@@ -85,7 +85,7 @@ const authCtx = createContext({
 
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, defaultState, initState);
-  const [loginUser] = useMutation(LOGIN);
+  const [loginUser, { client }] = useMutation(LOGIN);
   const [createUser] = useMutation(CREATE_USER);
 
   useEffect(() => {
@@ -127,7 +127,10 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => dispatch({ type: LOGOUT });
+  const logout = async () => {
+    await client.clearStore();
+    dispatch({ type: LOGOUT });
+  };
 
   const auth = {
     ...state,
