@@ -1,7 +1,6 @@
 const {
   AuthenticationError,
   UserInputError,
-  ForbiddenError,
 } = require("apollo-server-express");
 const { User } = require("../models");
 const { signToken } = require("../util/auth");
@@ -12,7 +11,7 @@ const resolvers = {
       // if ctx.user is undefined, then no token or an invalid token was
       // provided by the client.
       if (!ctx.user) {
-        throw new ForbiddenError("Must be logged in.");
+        throw new AuthenticationError("Must be logged in.");
       }
       return User.findOne({ email: ctx.user.email });
     },
