@@ -40,13 +40,13 @@ const defaultState = {
   user: null,
 };
 
-const initState = () => {
+const initState = (initialState) => {
   const authToken = token.get();
   if (!authToken) {
-    return defaultState;
+    return initialState;
   }
   return {
-    ...defaultState,
+    ...initialState,
     authToken,
     ...parseToken(authToken),
   };
@@ -84,7 +84,7 @@ const authCtx = createContext({
 });
 
 export const AuthProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(authReducer, initState);
+  const [state, dispatch] = useReducer(authReducer, defaultState, initState);
   const [loginUser] = useMutation(LOGIN);
   const [createUser] = useMutation(CREATE_USER);
 
