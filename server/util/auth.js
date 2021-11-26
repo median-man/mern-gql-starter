@@ -1,8 +1,7 @@
 const jwt = require("jsonwebtoken");
 const util = require("util");
 
-const { SECRET } = process.env;
-const TOKEN_EXP = "2h";
+const { SECRET, TOKEN_EXP } = process.env;
 
 jwt.sign = util.promisify(jwt.sign);
 jwt.verify = util.promisify(jwt.verify);

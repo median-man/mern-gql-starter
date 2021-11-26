@@ -5,8 +5,8 @@
   "main": "server/server.js",
   "scripts": {
     "start": "node server/server.js",
-    "develop": "concurrently -c magenta,cyan \"npm:server\" \"npm:client\"",
-    "client": "cd client && npm start",
+    "develop": "concurrently -c magenta,cyan \"npm:server\" \"npm:react\"",
+    "react": "cd client && npm start",
     "server": "cd server && npm run watch",
     "install": "cd server && npm i && cd ../client && npm i",
     "build": "cd client && npm run build"
@@ -15,7 +15,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "concurrently": "^5.1.0",
+    "concurrently": "^6.4.0",
     "eslint": "^7.12.1",
     "eslint-config-prettier": "^6.15.0",
     "prettier": "^2.1.2"
