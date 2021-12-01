@@ -25,7 +25,7 @@ Boilerplate app for full-stack MERN app with Create React App client tool chain.
 - Add the following values to the Heroku config for the app:
 
   - `SECRET` - used for signing and verifying tokens
-  - `TOEKN_EXP` - duration before token expires in milliseconds or a string
+  - `TOKEN_EXP` - duration before token expires in milliseconds or a string
     describing a time span. ([zeit/ms](https://github.com/vercel/ms))
   - `MONGODB_URI` - used for connecting to MongoDB service
 
