@@ -1,7 +1,7 @@
 import { ApolloProvider } from "@apollo/client";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
-import PrivateRoute from "./components/PrivateRoute";
+import RequireAuth from "./components/RequireAuth";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import ProtectedPageExample from "./pages/ProtectedPageExample";
@@ -15,22 +15,21 @@ function App() {
       <Router>
         <AuthProvider>
           <Navbar />
-          <Switch>
-            <Route exact path="/">
-              <Home />
-            </Route>
-            <Route path="/login">
-              <Login />
-            </Route>
-            <Route path="/signup">
-              <SignUp />
-            </Route>
-            {/* Use PrivateRoute for pages that should only be accessible to a
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<SignUp />} />
+            {/* Use <RequiredAuth> for pages that should only be accessible to a
             user that has logged in.*/}
-            <PrivateRoute path="/protected">
-              <ProtectedPageExample />
-            </PrivateRoute>
-          </Switch>
+            <Route
+              path="/protected"
+              element={
+                <RequireAuth>
+                  <ProtectedPageExample />
+                </RequireAuth>
+              }
+            />
+          </Routes>
         </AuthProvider>
       </Router>
     </ApolloProvider>

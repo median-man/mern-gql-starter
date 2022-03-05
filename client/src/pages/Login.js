@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Redirect } from "react-router-dom";
+import { useLocation, Navigate } from "react-router-dom";
 import { useAuth } from "../util/auth";
 
 // This signup form is intentionally minimalist to reduce effort required to
@@ -26,6 +26,7 @@ const initialFormState = {
 export default function Login() {
   const { isLoggedIn, login, loading, error } = useAuth();
   const [formState, setFormState] = useState(initialFormState);
+  const location = useLocation();
 
   useEffect(() => {
     if (error) {
@@ -45,9 +46,11 @@ export default function Login() {
   };
 
   if (isLoggedIn) {
-    // redirect to home if user is logged in
-    return <Redirect to="/" />;
+    // navigate to page user was redirected from or the home page.
+    const from = location.state?.from?.pathname || "/";
+    return <Navigate to={from} replace />
   }
+
   return (
     <div>
       <h1>Login</h1>

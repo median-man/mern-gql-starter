@@ -6,7 +6,7 @@ export default function Navbar() {
   const { isLoggedIn, logout } = useAuth();
   return (
     <nav className="navbar">
-      <NavLink exact to="/" className="navbar-link">
+      <NavLink to="/" className="navbar-link">
         Home
       </NavLink>
       {isLoggedIn ? (

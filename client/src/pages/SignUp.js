@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { useAuth } from "../util/auth";
 
 // This signup form is intentionally minimalist to reduce effort required to
@@ -46,8 +46,8 @@ export default function SignUp() {
   };
 
   if (isLoggedIn) {
-    // redirect to home if user is logged in
-    return <Redirect to="/" />;
+    // navigate to the home page
+    return <Navigate to="/" replace />
   }
   return (
     <div>
