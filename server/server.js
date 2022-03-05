@@ -9,9 +9,9 @@ const { authMiddleware } = require("./util/auth");
 
 const PORT = process.env.PORT || 3001;
 
-startServer();
+startServer(typeDefs, resolvers);
 
-async function startServer() {
+async function startServer(typeDefs, resolvers) {
   try {
     // Wait for db connection
     await new Promise((resolve) => db.once("open", resolve));
